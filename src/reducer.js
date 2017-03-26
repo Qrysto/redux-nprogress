@@ -1,5 +1,6 @@
 import { START, PROGRESS, DONE, ERROR, CLEAR } from './actionTypes'
 
+// State shape:
 // {
 //   bool loading,
 //   number percentage,
@@ -10,7 +11,6 @@ const startingPercentage = 15
 
 const initialState = {
   shown: false,
-  error: false,
 }
 
 export default (state = initialState, { type, payload }) => {

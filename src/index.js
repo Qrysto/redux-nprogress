@@ -1,46 +1,61 @@
 import { START, PROGRESS, DONE, ERROR, CLEAR } from './actionTypes'
 
+const defaultOptions = {
+  minInc: .1,
+  maxInc: .3,
+  trickleInterval: 500,
+}
+
 export default class NavigationProgress {
-  constructor({
-    minInc = .1,
-    maxInc = .3,
-    trickleInterval = 500,
-  }) {
-    this.stopTrickling = null
-    this.stopClearing = null
+  constructor(store, options) {
+    if (!store) {
+      throw new Error('Redux store must be passed as the first parameter')
+    }
+
+    this.store = store
+    this.options = Object.assign({}, defaultOptions, options)
+
+    this.trickle = null
+    this.clear = null
   }
 
   start() {
-    clearTimeout(stopClearing)
-    store.dispatch({ type: START })
+    clearTimeout(clear)
+    this.store.dispatch({ type: START })
 
-    const trickle = () => store.dispatch({
+    const { minInc, maxInc, trickleInterval } = this.options
+    this.trickle = setInterval(
+      () => this.inc(Math.random() * (maxInc - minInc) + minInc), 
+      trickleInterval
+    )
+  }
+
+  inc(rate) {
+    this.store.dispatch({
       type: PROGRESS,
-      payload: Math.random() * (maxInc - minInc) + minInc,
+      payload: rate,
     })
-
-    clearInterval(this.stopTrickling)
-    this.stopTrickling = setInterval(trickle, trickleInterval)
-    trickle()
   }
 
   finish() {
-    clearInterval(this.stopTrickling)
+    clearInterval(this.trickle)
 
-    dispatch({ type: DONE })
+    this.store.dispatch({ type: DONE })
 
-    this.stopClearing = setTimeout(() => {
+    this.clear = setTimeout(() => {
       dispatch({ type: CLEAR })
     }, 200)
   }
 
   error() {
-    clearInterval(this.stopTrickling)
+    clearInterval(this.trickle)
 
-    dispatch({ type: ERROR })
+    this.store.dispatch({ type: ERROR })
 
-    this.stopClearing = setTimeout(() => {
+    this.clear = setTimeout(() => {
       dispatch({ type: CLEAR })
     }, 200)
   }
 }
+
+export { reducer } from './reducer'
