@@ -1,10 +1,11 @@
 {
   "name": "redux-nav-progress",
-  "version": "0.0.4",
+  "version": "0.0.18",
   "main": "lib/index.js",
   "repository": "https://github.com/Qrysto/redux-nprogress.git",
   "author": "Krysto <quy.p.hoang@gmail.com>",
   "license": "MIT",
+  "keywords": ["redux", "navigation", "progress", "nprogress", "progress bar"],
   "devDependencies": {
     "babel-cli": "^6.24.0",
     "babel-preset-latest": "^6.24.0"

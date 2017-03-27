@@ -28,7 +28,7 @@ export default (state = initialState, { type, payload }) => {
 
         return {
           shown: true,
-          percentage: state.percentage + (100 - state.percentage) * rate,
+          percentage: state.percentage + (98 - state.percentage) * rate,
           error: false,
         }
       } else {
@@ -61,6 +61,9 @@ export default (state = initialState, { type, payload }) => {
       return {
         shown: false,
       }
+
+    default:
+      return state
   }
 }
 

@@ -3,7 +3,8 @@ import { START, PROGRESS, DONE, ERROR, CLEAR } from './actionTypes'
 const defaultOptions = {
   minInc: .1,
   maxInc: .3,
-  trickleInterval: 500,
+  trickleInterval: 800,
+  fadeDuration: 400, // time in ms to wait for progress bar to fade out before resetting
 }
 
 export default class NavigationProgress {
@@ -17,17 +18,27 @@ export default class NavigationProgress {
 
     this.trickle = null
     this.clear = null
+
+    this.start = this.start.bind(this)
+    this.inc = this.inc.bind(this)
+    this.complete = this.complete.bind(this)
+    this.error = this.error.bind(this)
+  }
+
+  setStore(store) {
+    this.store = store
   }
 
   start() {
-    clearTimeout(clear)
+    clearTimeout(this.clear)
     this.store.dispatch({ type: START })
 
     const { minInc, maxInc, trickleInterval } = this.options
-    this.trickle = setInterval(
-      () => this.inc(Math.random() * (maxInc - minInc) + minInc), 
-      trickleInterval
-    )
+
+    const trickle = () => {
+      this.inc(Math.random() * (maxInc - minInc) + minInc)
+    }
+    this.trickle = setInterval(trickle, trickleInterval)
   }
 
   inc(rate) {
@@ -37,14 +48,14 @@ export default class NavigationProgress {
     })
   }
 
-  finish() {
+  complete() {
     clearInterval(this.trickle)
 
     this.store.dispatch({ type: DONE })
 
     this.clear = setTimeout(() => {
-      dispatch({ type: CLEAR })
-    }, 200)
+      this.store.dispatch({ type: CLEAR })
+    }, this.options.fadeDuration)
   }
 
   error() {
@@ -53,9 +64,9 @@ export default class NavigationProgress {
     this.store.dispatch({ type: ERROR })
 
     this.clear = setTimeout(() => {
-      dispatch({ type: CLEAR })
-    }, 200)
+      this.store.dispatch({ type: CLEAR })
+    }, this.options.fadeDuration)
   }
 }
 
-export { reducer } from './reducer'
+export { default as reducer } from './reducer'
